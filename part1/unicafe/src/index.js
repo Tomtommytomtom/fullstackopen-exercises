@@ -43,16 +43,21 @@ const App = () => {
 
 const Statistics = ({reviews, functions}) => {
   if(!functions[2]()){
-    return <p>No feedback given</p>
+    return(
+      <>
+        <Header title="statistics" />
+        <p>No feedback given</p>
+      </>
+    )
   }
   return(
     <>
       <Header title="statistics" />
-      <Display string="good"    value={reviews[0]} />
-      <Display string="neutral" value={reviews[1]} />
-      <Display string="bad"     value={reviews[2]} />
-      <Display string="average"      value={functions[0]()} />
-      <DisplayPercent string="positive"     value={functions[1](reviews[0])} />
+      <Statistic string="good"    value={reviews[0]} />
+      <Statistic string="neutral" value={reviews[1]} />
+      <Statistic string="bad"     value={reviews[2]} />
+      <Statistic string="average"      value={functions[0]()} />
+      <StatisticPercent string="positive"     value={functions[1](reviews[0])} />
     </>
   )
 }
@@ -67,8 +72,8 @@ const Button = props => {
 
 const Header = props => <h1>{props.title}</h1>
 
-const Display = props => <p>{props.string} {props.value}</p>
-const DisplayPercent = props => <p>{props.string} {props.value} %</p>
+const Statistic = props => <p>{props.string} {props.value}</p>
+const StatisticPercent = props => <p>{props.string} {props.value} %</p>
 
 ReactDOM.render(<App />, 
   document.getElementById('root')
