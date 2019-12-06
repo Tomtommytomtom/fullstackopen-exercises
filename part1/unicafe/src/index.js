@@ -7,11 +7,27 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const reviews = [good, neutral, bad]
+
   const title = "give feedback"
 
   const setNewGood = newValue => setGood(newValue)
   const setNewNeutral = newValue => setNeutral(newValue)
   const setNewBad = newValue => setBad(newValue)
+
+  const sumOfReviews = () => good + bad + neutral
+
+  const calcAverage = () => (good - bad) / sumOfReviews()
+  const percentageOfVotes = review => (review / sumOfReviews()) * 100
+
+  const hasReceivedFeedback = () => {
+    if(sumOfReviews() === 0){
+      return false
+    }
+    return true
+  }
+
+  const statisticFunctions = [() => calcAverage(), (value) => percentageOfVotes(value), () => hasReceivedFeedback()]
 
   return (
     <div>
@@ -19,11 +35,25 @@ const App = () => {
       <Button name="good" onClick={() => setNewGood(good + 1)} />
       <Button name="neutral" onClick={() => setNewNeutral(neutral + 1)} />
       <Button name="bad" onClick={() => setNewBad(bad + 1)} />
-      <Header title="statistics" />
-      <Display string="good"    value={good} />
-      <Display string="neutral" value={neutral} />
-      <Display string="bad"     value={bad} />
+      <Statistics reviews={reviews} functions={statisticFunctions} />
     </div>
+  )
+}
+
+
+const Statistics = ({reviews, functions}) => {
+  if(!functions[2]()){
+    return <p>No feedback given</p>
+  }
+  return(
+    <>
+      <Header title="statistics" />
+      <Display string="good"    value={reviews[0]} />
+      <Display string="neutral" value={reviews[1]} />
+      <Display string="bad"     value={reviews[2]} />
+      <Display string="average"      value={functions[0]()} />
+      <DisplayPercent string="positive"     value={functions[1](reviews[0])} />
+    </>
   )
 }
 
@@ -38,6 +68,7 @@ const Button = props => {
 const Header = props => <h1>{props.title}</h1>
 
 const Display = props => <p>{props.string} {props.value}</p>
+const DisplayPercent = props => <p>{props.string} {props.value} %</p>
 
 ReactDOM.render(<App />, 
   document.getElementById('root')
