@@ -4,24 +4,40 @@ import ReactDOM from 'react-dom'
 const App = (props) => {
   const [selected, setSelected] = useState(0)
 
+  const [votes, setVote] = useState(Array(anecdotes.length).fill(0))
+
+  const getIndexOfHighestVote = voteArray => voteArray.reduce((acc, cur, idx) => {
+      if(cur > acc){
+          acc = idx
+    }})
+  
+
+  const addNewVote = indexOfAnecdote => {
+      const newVotes  = [...votes]
+      newVotes[indexOfAnecdote] += 1
+      return setVote(newVotes)
+    }
+
   const randomInt = max => Math.floor(Math.random() * max)
   const randomState = () => setSelected(randomInt(props.anecdotes.length))
-
 
   return (
     <div>
       <p>{props.anecdotes[selected]}</p>
-      <Button string="next anecdote" click={randomState} />
+      <Button string="next anecdote" click={() => randomState()} />
+      <Button string="vote" click={() => addNewVote(selected)} />
+      <Button string="getIndexOfHighest" click={console.log(getIndexOfHighestVote(votes))} />
+      <p>Votes: {votes[selected]}</p>
     </div>
   )
 }
 
 const Button = ({string, click}) =>{
-    console.log(click)
     return(
-        <button onClick={() => click()}>{string}</button>
+        <button onClick={click}>{string}</button>
     )
 }
+
 
 const anecdotes = [
   'If it hurts, do it more often',
