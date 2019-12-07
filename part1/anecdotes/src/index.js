@@ -6,10 +6,12 @@ const App = (props) => {
 
   const [votes, setVote] = useState(Array(anecdotes.length).fill(0))
 
-  const getIndexOfHighestVote = voteArray => voteArray.reduce((acc, cur, idx) => {
-      if(cur > acc){
-          acc = idx
-    }})
+  const getIndexOfHighestVote = () => votes.reduce((prevVote, curVote, curIdx) => {
+      if(curVote > votes[prevVote]){
+          return curIdx
+    }
+    return prevVote
+  },0)
   
 
   const addNewVote = indexOfAnecdote => {
@@ -18,19 +20,39 @@ const App = (props) => {
       return setVote(newVotes)
     }
 
-  const randomInt = max => Math.floor(Math.random() * max)
-  const randomState = () => setSelected(randomInt(props.anecdotes.length))
+  const randomNextInt = (max, prev) => {
+    const randomInteger = Math.floor(Math.random() * max)
+    if(randomInteger == prev){
+      return randomNextInt(max)
+    }
+    else{
+      return randomInteger
+    }
+  }
+
+  const randomState = () => setSelected(randomNextInt(props.anecdotes.length, selected))
 
   return (
     <div>
-      <p>{props.anecdotes[selected]}</p>
+      <DisplayAnecdote header="Anecdote of the Day" selected={selected} votes={votes} anecdotes={anecdotes}/>
       <Button string="next anecdote" click={() => randomState()} />
       <Button string="vote" click={() => addNewVote(selected)} />
-      <Button string="getIndexOfHighest" click={console.log(getIndexOfHighestVote(votes))} />
-      <p>Votes: {votes[selected]}</p>
+      <DisplayAnecdote header="Anecdote with most votes" selected={getIndexOfHighestVote()} votes={votes} anecdotes={anecdotes} />
     </div>
   )
 }
+
+const DisplayAnecdote = ({header, selected, votes, anecdotes}) => {
+  return(
+    <>
+      <Header title= {header} />
+      <p>{anecdotes[selected]}</p>
+      <p>has: {votes[selected]} votes</p>
+    </>
+  )
+}
+
+const Header = props => <h2>{props.title}</h2>
 
 const Button = ({string, click}) =>{
     return(
