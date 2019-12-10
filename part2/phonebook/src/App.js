@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
-import axios from 'axios'
+import personService from './services/phonebookentries'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,28 +12,38 @@ const App = () => {
   const [ newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(data => {
+        setPersons(data)
       })
-  },[])
+    },[])
 
   const addPerson = event => {
-    console.log(persons)
-      console.log(isPersonInPhonebook(newName))
     if(isPersonInPhonebook(newName)){
-      
-      alert(`${newName} is already added to phonebook`)
+      const result = window.confirm(`${newName} is already in the Phonebook, replace old Number with a new one?`)
+      if(result){
+        const id = persons.find(person => person.name === newName).id
+        const person = {
+          name : newName,
+          number : newNumber
+        }
+        personService.update(id, person)
+          .then(persons => setPersons(persons))
+      }
     }else{
       event.preventDefault()
-      console.log('button has been clicked', event.target)
       const person = {
         name : newName,
         number : newNumber
       }
-      setPersons(persons.concat(person))
-      setNewName('')
+      personService
+        .create(person)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
     
   }
@@ -54,9 +64,18 @@ const App = () => {
     setNewFilter(event.target.value)
   }
   
-
+  const deletePerson = (id, name) => {
+    const result = window.confirm(`Delete ${name} ?`)
+    if(result){
+      personService
+        .deletePerson(id)
+        .then(() => {
+          const newPersons = persons.filter(person => person.id !== id)
+          setPersons(newPersons)
+        })
+  }
+} 
   
-
   return (
     <div>
       <h1>Phonebook</h1>
@@ -73,7 +92,7 @@ const App = () => {
         numberOnChange={handleNumberChange}
       />
       <h3>Numbers</h3>
-      {newFilter === '' ? <Persons persons={persons}/> : <Persons persons={personsIncluding(newFilter)}/>}
+      {newFilter === '' ? <Persons onClick={deletePerson} persons={persons}/> : <Persons onClick={deletePerson} persons={personsIncluding(newFilter)}/>}
     </div>
   )
 }

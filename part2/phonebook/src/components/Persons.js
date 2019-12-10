@@ -1,17 +1,28 @@
 import React from 'react';
-import Person from './Person';
 
-const makePersonArray = arr => arr.map(
+const makePersonArray = (arr, onClick) => arr.map(
     person => <Person
-     key={person.name}
+     key={person.id}
+     id={person.id}
      name={person.name}
      number={person.number}
+     onClick={onClick}
     />)
 
-const Persons = ({persons}) => {
+const Persons = ({persons, onClick}) => {
     return (
         <div>
-            {makePersonArray(persons)}
+            {makePersonArray(persons,onClick)}
+        </div>
+    );
+};
+
+const Person = ({name, number,id, onClick}) => {
+
+    return (
+        <div>
+            <li>{name} {number} <button onClick={() => onClick(id, name)}>delete</button></li>
+            
         </div>
     );
 };
