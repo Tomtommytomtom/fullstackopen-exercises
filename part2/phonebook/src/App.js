@@ -168,6 +168,4 @@ const Notification = ({message, styles}) => {
   )
 }
 
-
-
 export default App
